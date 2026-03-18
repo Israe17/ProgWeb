@@ -6,12 +6,20 @@
  */
 
 //CACHES
-const CACHE_STATIC_NAME='static-v1'
-const CACHE_DYNAMIC_NAME='dynamic-v1'
-const CACHE_IMMUTABLE_NAME='immutable-v1'
+const CACHE_STATIC_NAME='static-v3'
+const CACHE_DYNAMIC_NAME='dynamic-v3'
+const CACHE_IMMUTABLE_NAME='immutable-v3'
 const MAX_CACHE_ITEMS=50
 const APP_BASE_URL = new URL('./', self.location.href)
 const appAsset = path => new URL(path, APP_BASE_URL).href
+const STATIC_FILES = [
+    appAsset('./'),
+    appAsset('index.html'),
+    appAsset('manifest.json'),
+    appAsset('css/style.css'),
+    appAsset('js/script.js?v=3'),
+    appAsset('img/no-image.png')
+]
 
 //ETAPA DE INSTALACION
 self.addEventListener('install',event=>{
@@ -19,27 +27,11 @@ self.addEventListener('install',event=>{
     /**Cache estatico lo usamos para almacenar archivos estaticos del sitio */
     const cacheStatic= caches.open(CACHE_STATIC_NAME)
         .then(cache=>{
-            return cache.addAll([
-                appAsset('./'),
-                appAsset('index.html'),
-                appAsset('css/style.css'),
-                appAsset('js/script.js'),
-                appAsset('img/no-image.png')
-                /*Agregar imagenes*/
-            ])
-        })
-    /**Cache inmutable se utiliza para assets de terceros */
-
-    const cacheImmutable=caches.open(CACHE_IMMUTABLE_NAME)
-        .then(cache=>{
-            return cache.addAll([
-                'https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'
-                
-            ])
+            return cache.addAll(STATIC_FILES)
         })
 
     event.waitUntil(
-        Promise.all([cacheImmutable,cacheStatic]).then(()=>{
+        Promise.all([cacheStatic]).then(()=>{
             console.log('Instalacion completa')
             console.log('Nueva version')
             self.skipWaiting()
@@ -59,7 +51,7 @@ self.addEventListener('activate',event=>{
                     return caches.delete(k)
                 })
             )
-        )
+        ).then(() => self.clients.claim())
     )
 })
 function clearCache(cacheName,maxItems){

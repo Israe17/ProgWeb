@@ -1,15 +1,15 @@
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-        const appBaseUrl = new URL('./', window.location.href)
-        const serviceWorkerUrl = new URL('serviceworker.js', appBaseUrl)
+        const serviceWorkerPath = './serviceworker.js?v=3'
+        const serviceWorkerUrl = new URL(serviceWorkerPath, window.location.href)
+
+        console.log('Intentando registrar SW desde:', serviceWorkerUrl.href)
 
         try {
-            const reg = await navigator.serviceWorker.register(serviceWorkerUrl, {
-                scope: appBaseUrl.pathname
-            })
-            console.log('Service Worker se ha instalado correctamente. Scope:', reg.scope)
+            const reg = await navigator.serviceWorker.register(serviceWorkerPath)
+            console.log('Service Worker registrado correctamente. Scope:', reg.scope)
         } catch (err) {
-            console.log('Error al instalar el SW: ', err)
+            console.error('Error al instalar el SW:', err)
         }
     })
 } else {
