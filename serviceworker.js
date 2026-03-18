@@ -10,6 +10,8 @@ const CACHE_STATIC_NAME='static-v1'
 const CACHE_DYNAMIC_NAME='dynamic-v1'
 const CACHE_IMMUTABLE_NAME='immutable-v1'
 const MAX_CACHE_ITEMS=50
+const APP_BASE_URL = new URL('./', self.location.href)
+const appAsset = path => new URL(path, APP_BASE_URL).href
 
 //ETAPA DE INSTALACION
 self.addEventListener('install',event=>{
@@ -18,11 +20,11 @@ self.addEventListener('install',event=>{
     const cacheStatic= caches.open(CACHE_STATIC_NAME)
         .then(cache=>{
             return cache.addAll([
-                '/',
-                'index.html',
-                'css/style.css',
-                'js/script.js',
-                'img/no-image.png'
+                appAsset('./'),
+                appAsset('index.html'),
+                appAsset('css/style.css'),
+                appAsset('js/script.js'),
+                appAsset('img/no-image.png')
                 /*Agregar imagenes*/
             ])
         })
@@ -78,6 +80,8 @@ function clearCache(cacheName,maxItems){
 //  EVENTOS QUE CAPTURA EL SW
 /**FETCH */
 self.addEventListener('fetch',event=>{
+    if (event.request.method !== 'GET') return
+
     /**TODO: filtrar el metodo de la peticion HTTP */
     /**ESTRATEGIAS MANEJO DE CACHE
      * 1- CACHE ONLY ---> Nunca va a a red --- solo durante el proceso de instalacion
@@ -123,7 +127,7 @@ self.addEventListener('fetch',event=>{
             if(resolved) return
             resolved=true
             if(/\.(png|jpg|jpeg|webp)$/i.test(event.request.url)){
-                resolve(caches.match('/img/no-image.png'))
+                resolve(caches.match(appAsset('img/no-image.png')))
             }else{
                 reject(new Error('Sin respuesta de la red ni del cache'))
             }

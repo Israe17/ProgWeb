@@ -1,8 +1,9 @@
 {
-    "id":"/",
+    "id":"./",
     "short_name":"UNA Task",
     "name":"Administrador de tareas",
-    "start_url":"index.html",
+    "start_url":"./",
+    "scope":"./",
     "background_color":"#2A3759",
     "theme_color":"#2A3759",
     "display":"standalone",
